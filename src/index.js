@@ -41,7 +41,33 @@ class Board extends React.Component {
     );
   }
 }
+//ejercicio 2:
+class Button extends React.Component {
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      clicked: false
+    };
+  }
+
+  changeColor = event => {
+    this.setState({ 
+      clicked: !this.state.clicked 
+    });
+    if (this.props.onClick) this.props.onClick()     
+  };
+
+  render() {
+    let btn_class = this.state.clicked ? "cambioColor" : "isActive";
+
+    return (
+      <button className={btn_class} onClick={this.changeColor}>
+        {this.props.name}
+      </button>
+    );
+  }
+}
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -53,7 +79,11 @@ class Game extends React.Component {
       ],
       stepNumber: 0,
       xIsNext: true,
-      id: 0
+      //ejercicio 1:
+      id: 0,
+      //ejercicio 2:
+      clickedBtn : {},
+      btnStyle: Array(9).fill(null)
     };
   }
 
@@ -72,31 +102,20 @@ class Game extends React.Component {
           squares: squares
         }
       ]),
-      ubicacion: ubicacion.concat([
-        {
-          squares: squares
-        }
-      ]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
+      //ejercicio 1:
       id: i
       
     });
     
   }
 
-  jumpTo(step, className) {
+  jumpTo(step) {
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0
     });
-    let classColor = document.getElementsByClassName("color");
-    if (classColor.classList.contains("cambioColor")){
-      classColor.classList.remove("cambioColor");
-    }
-    else{
-      classColor.classList.add("cambioColor");
-    }
   }
   switch(){
     console.log("move");
@@ -106,6 +125,7 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
+    //ejercicio 1:
     let casilla = this.state.id;
     const empieza = this.state.id;
     if (empieza === 0){
@@ -138,7 +158,9 @@ class Game extends React.Component {
     else if ( casilla === 8){
       casilla = "Fila 3 Columna 3";
     }
-    const moves = history.map((step, move, cas) => {
+
+
+    const moves = history.map((step, move) => {
       const desc = move ?
         'Go to move #' + move :
         'Go to game start';
@@ -148,10 +170,9 @@ class Game extends React.Component {
       return (
         <div key={move}>
           <ul>
-            <li onClick={() => this.jumpTo(move)}>
-              <button className="color">
-                {desc} 
-              </button>
+            <li>
+              {/* ejercicio 2: */}
+              <Button name={desc} onClick={() => this.jumpTo(move)} />
             </li>
           </ul>
         </div>        
@@ -177,6 +198,7 @@ class Game extends React.Component {
           <div>{status}</div>
           <button  onClick={() => this.switch()}>Switch order</button>
           <div>{moves}</div>
+          {/* ejercicio 1: */}
           <div>{casilla}</div>
         </div>
       </div>
