@@ -48,11 +48,11 @@ body {
   .game-info {
     margin-left: 20px;
   }
+  /* ejercicio 2: */
   .cambioColor{
-    color: white;
-    background-color: black;
+    font-weight: bold;
+    background-color: #B5B8B1;
   }
   .inActive{
-    color: black;
-    background-color: none;
+    font-weight: normal;
   }

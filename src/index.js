@@ -3,12 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button className={"square"} onClick={props.onClick}>
       {props.value}
     </button>
   );
 }
-
+// {props.stepNumber === move ? 'cambioColor' : 'inActive'}+
 class Board extends React.Component {
   renderSquare(i) {
     return (
@@ -41,33 +41,7 @@ class Board extends React.Component {
     );
   }
 }
-//ejercicio 2:
-class Button extends React.Component {
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      clicked: false
-    };
-  }
-
-  changeColor = event => {
-    this.setState({ 
-      clicked: !this.state.clicked 
-    });
-    if (this.props.onClick) this.props.onClick()     
-  };
-
-  render() {
-    let btn_class = this.state.clicked ? "cambioColor" : "isActive";
-
-    return (
-      <button className={btn_class} onClick={this.changeColor}>
-        {this.props.name}
-      </button>
-    );
-  }
-}
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -81,25 +55,25 @@ class Game extends React.Component {
       xIsNext: true,
       //ejercicio 1:
       id: 0,
-      //ejercicio 2:
-      clickedBtn : {},
-      btnStyle: Array(9).fill(null)
+      //ejercicio 4:
+      toggleAsc: true
     };
   }
 
   handleClick(i) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const ubicacion = this.state.history.slice(0, this.state.id + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
     squares[i] = this.state.xIsNext ? "X" : "O";
+    //console.log(calculateWinner());
     this.setState({
       history: history.concat([
         {
-          squares: squares
+          squares: squares,
+          currentLocation: getLocation(i)
         }
       ]),
       stepNumber: history.length,
@@ -108,84 +82,57 @@ class Game extends React.Component {
       id: i
       
     });
-    
   }
 
   jumpTo(step) {
     this.setState({
       stepNumber: step,
-      xIsNext: (step % 2) === 0
+      xIsNext: (step % 2) === 0,
     });
   }
+  //ejercicio 4:
   switch(){
-    console.log("move");
+      this.setState({
+        toggle: "desc",
+        toggleAsc: !this.state.toggleAsc
+      })
   }
 
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
-    //ejercicio 1:
-    let casilla = this.state.id;
-    const empieza = this.state.id;
-    if (empieza === 0){
-      casilla = "Empieza la partida";
-    }
-    else if ( casilla === 0){
-      casilla = "Fila 1 Columna 1";
-    }
-    else if ( casilla === 1){
-        casilla = "Fila 1 Columna 2";
-    }
-    else if ( casilla === 2){
-      casilla = "Fila 1 Columna 3";
-    }
-    else if ( casilla === 3){
-      casilla = "Fila 2 Columna 1";
-    }
-    else if ( casilla === 4){
-      casilla = "Fila 2 Columna 2";
-    }
-    else if ( casilla === 5){
-      casilla = "Fila 2 Columna 3";
-    }
-    else if ( casilla === 6){
-      casilla = "Fila 3 Columna 1";
-    }
-    else if ( casilla === 7){
-      casilla = "Fila 3 Columna 2";
-    }
-    else if ( casilla === 8){
-      casilla = "Fila 3 Columna 3";
-    }
-
-
-    const moves = history.map((step, move) => {
+    let moves = history.map((step, move) => {
+      
       const desc = move ?
         'Go to move #' + move :
         'Go to game start';
-      // const casi = cas ? 
-      //   'Estas en la casilla ' + cas : 
-      //   'Hola';
+      //ejercicio 1:
+      const casilla = step.currentLocation;
       return (
-        <div key={move}>
-          <ul>
+          <ul key={move}>
             <li>
               {/* ejercicio 2: */}
-              <Button name={desc} onClick={() => this.jumpTo(move)} />
+              <button className={this.state.stepNumber === move ? 'cambioColor' : 'inActive'} onClick={() => this.jumpTo(move)} >
+                {/* ejercicio 1: */}
+                {desc} {casilla}
+              </button>
             </li>
-          </ul>
-        </div>        
+          </ul>       
       );
+      
     });
-
     let status;
     if (winner) {
       status = "Winner: " + winner;
-    } else {
+    }
+    //ejercicio 6:
+    else if(!current.squares.includes(null)){
+      status = "It's a draw";
+    }
+    else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
-
     return (
       <div className="game">
         <div className="game-board">
@@ -196,12 +143,12 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <button  onClick={() => this.switch()}>Switch order</button>
-          <div>{moves}</div>
-          {/* ejercicio 1: */}
-          <div>{casilla}</div>
+          {/* ejercicio 4: */}
+          <button  onClick={() => this.switch()}>Switch {this.state.toggleAsc ? "asc" : "desc"}</button>
+          <div>{this.state.toggleAsc ? moves : moves.reverse()}</div>
         </div>
       </div>
+      // {moves}
     );
   }
 }
@@ -229,3 +176,39 @@ function calculateWinner(squares) {
   }
   return null;
 }
+// EJERCICIO 1:
+const getLocation = (move) => { 
+  switch (move){
+    case 0:
+      move = "Fila 1 Columna 1";
+      break;
+    case 1:
+      move = "Fila 1 Columna 2";
+      break;
+    case 2:
+      move = "Fila 1 Columna 3";
+      break;
+    case 3:
+      move = "Fila 2 Columna 1";
+      break;
+    case 4:
+      move = "Fila 2 Columna 2";
+      break;
+    case 5:
+      move = "Fila 2 Columna 3";
+      break;
+    case 6:
+      move = "Fila 3 Columna 1";
+      break;
+    case 7:
+      move = "Fila 3 Columna 2";
+      break;
+    case 8:
+      move = "Fila 3 Columna 3";
+      break;
+    default:
+      break;
+  }
+ return move;
+};
+
