@@ -56,3 +56,7 @@ body {
   .inActive{
     font-weight: normal;
   }
+  /* ejercicio 5: */
+  .highlight {
+    background-color: #90ee90;
+  }
